@@ -1,0 +1,137 @@
+SETENV(ORACLE_HOME='PATH')
+SETENV(ORACLE_SID='SID')
+
+export PATH=$PATH:$GG_HOME
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME/lib
+
+
+####################################################################################################################################################
+check the loggin in database
+####################################################################################################################################################
+
+select supplemental_log_data_min,force_loggin from gv$database;
+
+sql> alter database add supplemental log data;
+
+sql> alter database force logging;
+
+sql> alter system switch logfile;
+
+sql> alter system set enable_goldengate_replication=true;
+
+
+./ggsci
+
+ggsci> dblogin userid username@tns,password password
+ggsci> add schematrandata schema_name allcols
+
+or 
+
+ggsci> all schematrandata schema_name noschedulingcols
+
+to enable loggin of particular tables we have to do the following
+
+ggsci> add trandata schema_name.table_name
+
+
+####################################################################################################################################################
+disadvantages
+####################################################################################################################################################
+
+1. virtual columns are not supported
+2. tables created as external are not captured
+3. tables created with table compression are not supported
+4. materialized views created with rowid are not supported
+
+sequences are supported in active-passive replication structure,source and target must have identical cache size and incremental values
+truncate statement is supported how ever in active-active bidirectional replication.Truncates must always orginate in the same server
+
+no DDL operations are supported on oracle reserved schemas
+
+
+1st Letter (Process Type)
+
+Extract E
+Data Pump P
+Replicat R
+
+2nd Letter (Database User/Schema)
+
+TIGER T
+FOX F
+
+3rd and 4th Letters (Location of Database)
+TENNESSEE TN
+DALLAS DL
+
+5th Letter (Application Environment)
+
+Development D
+Test T
+UAT U
+Production P
+
+6th, 7th, and 8th Letters (Channel Number)
+
+001, 002, and so on
+
+
+####################################################################################################################################################
+privileges for the golden gate user
+####################################################################################################################################################
+create session with admin option
+resource
+alter system
+dbms_goldengate_auth_grant_admin_privilege
+insert,update,delete on target schema tables
+create table
+ddl privileges on target schema
+DBA
+
+
+Oracle provides are package for the privileges
+
+sql>exec  dbms_goldengate_auth.grant_admin_privilege('ggsuer');
+
+sql>exec dbms_goldengate_auth.grant_admin_privilege('ggsuser','capture');
+sql>exec dbms_goldengate_auth.grant_admin_privilege('ggsuser','apply');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

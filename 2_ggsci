@@ -1,0 +1,36 @@
+##################################################################################################################################
+after installation
+##################################################################################################################################
+
+ggsci> create subdirs
+
+ggsci> status all
+
+ggsci> edit param mgr
+
+port 7809
+autostart E* ##### which means it autostarts extract only
+laginfominutes 5
+lagcriticalminutes 5
+
+----------------------------
+also we can specify dynamic port list like below
+
+DYNAMICPORTLIST 7809-7879
+
+------------------------------------------------------------------------------------------------------
+now start the manager
+ggsci> start mgr
+
+ggsci> status all
+
+ggsci> view report mgr
+
+ggsci> stop mgr
+
+ggsci> status mgr
+
+ggsci> status all
+
+
+
