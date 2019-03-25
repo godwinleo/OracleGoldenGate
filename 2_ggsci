@@ -33,4 +33,188 @@ ggsci> status mgr
 ggsci> status all
 
 
+##################################################################################################################################
+adding extract
+##################################################################################################################################
+
+ggsci> add extract ettnd001,tranlog,begin 2015-11-10 05:03
+
+or 
+
+ggsci> add extract ettnd01,tranlog, begin now
+
+
+ggsci> add rmtrail /path/dirdat/t1,extract ettnd01, megabytes 60
+
+ggsci> edit param ettnd01
+
+extract ettnd01
+userid username@tns, password password
+rmhost node2.godwin.com,mgrport 7809
+rmtrail /path/dirdat/f1 ####this is the path in the target server
+table username.table_name;
+
+-----------------------------------------------------------------
+
+ggsci> add replicat rfdld001,extract /path/dirdat/f1, nodbcheckpoint
+
+ggsci> edit param rfdld001
+
+replicat rfdld001
+purgeoldextracts
+assume targetdefs
+discardfile /path/dirrpt/rfdld001.dsc,purge,megabytes 599
+userid username@targettns,password password
+map username.table_name, target username.tablename;
+
+
+##################################################################################################################################
+creating definition file
+##################################################################################################################################
+definition files are created in the dirdef directory, create the temp.prd in dirdef folder
+
+below is temp.prm file
+-------------------------------------------------
+defsfile /path/dirdef/rfdld001.def
+userid username@tns, password password
+table username.table_name
+------------------------------------------------
+execute the below
+
+defgen paramfile /path/dirdef/temp.prm
+
+now copy the /path/dirdef/rfdld001.def to the target /path/dirdef/rfdld001.def and
+
+remove the assumetargetdefs and put the below
+---------------------------------------------------
+--assumetargetdefs
+sourcedefs /path/dirdef/rfdld001.def
+-----------------------------------------------
+##################################################################################################################################
+Enable the supplimental loggin for ogg
+##################################################################################################################################
+ggsci> dblogin userid username@tns ,password password
+ggsci> add schematrandata username allcols
+or
+ggsci> add schematrandata username noschedulingcols
+
+to enable logging only for specific tables use the below command
+
+ggsci> add trandata username.tablename
+##################################################################################################################################
+----------------setting up the initial extract process on the source database----------------------------------------------------
+
+ggsci> add extract initext1,sourceistable
+
+ggsci> edit param initext1
+-------------------------------------
+extract initext1
+rmhost node2.godwin.com,mgrport 7809
+rmttask replicat,group initrep1
+userid username@tns,password password
+table username.table_name
+
+----------------------setting up the initial replicat process--------------------------------------------------------------------
+ggsci> add replicat initrep1,specialrun #### note that the replicat name provided in extrat is same as we are proviing here
+ggsci> edit param initrep1
+-----------------------------------------
+replicat initrep1
+assumetargetdefs
+discardfile /path/dirrpt/initrep1.dsc,megabytes 599,append
+userid username@targettns, password password
+map username.table_name, target username.tablename
+
+
+now start the mgr,extract and replicate and test
+
+ggsci> start mgr
+ggsci> start initext1
+ggsci> start initrep1
+
+ggsci> info all
+
+ggsci> stats initext1
+ggsci> stats initrep1
+
+##################################################################################################################################
+OGG subdirs
+##################################################################################################################################
+Directory Files It Stores
+dirprm Parameter files
+dirrpt Report files
+dirchk Checkpoint files
+dirpcs Process status files
+dirsql SQL script files
+dirdef Database definitions files
+dirdat Extract data files
+dirtmp Temporary files
+dirver Veridata files
+dirver/lock Veridata lock files
+dirver/oos Veridata out-of-sync files
+dirver/oosxml Veridata out-of-sync XML files
+dirver/params Veridata parameter files
+dirver/report Veridata report files
+dirver/status Veridata status files
+dirver/trace Veridata trace files
+dirout Stdout files
+##################################################################################################################################
+character set issue
+##################################################################################################################################
+Character Set Description
+ar8ados710t Arabic MS-DOS 710 8-bit Latin/Arabic
+ar8arabicmact Mac 8-bit Latin/Arabic
+ar8hparabic8t HP 8-bit Latin/Arabic
+ar8iso8859p6 ISO 8859-6 Latin/Arabic
+ar8mswin1256 MS Windows Code Page 1256 8-Bit Latin/Arabic
+az8iso8859p9e ISO 8859-9 Azerbaijani
+bg8pc437s IBM-PC Code Page 437 8-bit (Bulgarian Modification)
+blt8iso8859p13 ISO 8859-13 Baltic
+blt8pc775 IBM-PC Code Page 775 8-bit Baltic
+hu8abmod Hungarian 8-bit Special AB Mod
+in8iscii Multiple-Script Indian Standard 8-bit Latin/Indian
+ja16dbcs IBM EBCDIC 16-bit Japanese
+ko16mswin949 MS Windows Code Page 949 Korean
+s8ebcdic1143 EBCDIC Code Page 1143 8-bit Swedish
+th8tisebcdics Thai Industrial Standard 620-2533 - EBCDIC Server 8-bit
+we8dec DEC 8-bit West European
+we8iso8859p1 ISO 8859-1 West European
+UTF-8 ISO-10646 UTF-8, surrogate pairs are 4 bytes per character
+UTF-16 ISO-10646 UTF-16
+UTF-32 ISO-10646 UTF-32
+US-ASCII US-ASCII, ANSI X34-1986
+windows-1250 Windows Central Europe
+ibm-867 DOS Hebrew/IBM
+IBM277 IBM 277-1/697-1 EBCDIC, Denmark, Norway
+IBM500 IBM 500-1/697-1 EBCDIC, International
+ibm-942 IBM Windows Japanese
+
+Using CHARSET
+
+CHARSET character_set_name
+
+source character set if it is different use the below
+
+SOURCECHARSET character_set_name
+
+SOURCECHARSET OVERRIDE
+
+using nls_lang
+
+setenv(NLS_LANG="AMERICAN_AMERICA.AL32UTF8");
+
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
 
